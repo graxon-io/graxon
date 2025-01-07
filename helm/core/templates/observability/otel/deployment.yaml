@@ -1,0 +1,71 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Release.Name }}-graxon-otel
+  labels:
+    app.kubernetes.io/name: {{ .Release.Name }}
+    app.kubernetes.io/instance: graxon
+    app.kubernetes.io/component: otel
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: {{ .Release.Name }}
+      app.kubernetes.io/instance: graxon
+      app.kubernetes.io/component: otel
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: {{ .Release.Name }}
+        app.kubernetes.io/instance: graxon
+        app.kubernetes.io/component: otel
+    spec:
+      containers:
+        - name: otel
+          image: otel/opentelemetry-collector:0.115.1
+          args:
+            - '--config=/etc/otel-config.yml'
+          imagePullPolicy: Always
+          ports:
+            # -------------------------
+
+            # Prometheus metrics exposed by the Collector
+            - name: metrics
+              containerPort: 8888
+
+            # ------- receivers -------
+
+            # OTLP gRPC receiver
+            - name: in-grpc
+              containerPort: 4317
+
+            # OTLP http receiver
+            - name: in-http
+              containerPort: 4318
+
+            # ------- exporters -------
+
+            # Prometheus exporter metrics
+            - name: out-prometheus
+              containerPort: 9090
+
+            # -------------------------
+
+          # environment variables
+          env:
+            - name: MY_POD_IP
+              valueFrom:
+                fieldRef:
+                  fieldPath: status.podIP
+
+          # mount the config file
+          volumeMounts:
+            - name: otel-config
+              mountPath: /etc/otel-config.yml
+              subPath: otel-config.yml
+
+      #
+      volumes:
+        - name: otel-config
+          configMap:
+            name: {{ .Release.Name }}-graxon-otel

@@ -1,0 +1,19 @@
+
+# =================== Spring Config ===================
+
+#
+spring:
+  rabbitmq:
+    host: ${GRAXON_RABBITMQ_HOST:localhost}
+    port: 5672
+    username: user
+    password: password
+    listener:
+      direct:
+        observation-enabled: true
+      simple:
+        observation-enabled: true
+      stream:
+        observation-enabled: true
+    template:
+      observation-enabled: true

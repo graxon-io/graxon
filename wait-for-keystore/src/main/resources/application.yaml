@@ -1,0 +1,31 @@
+
+# =================== Logging Config ===================
+
+#
+logging:
+  level:
+    io.graxon: TRACE
+
+# =================== Spring Config ===================
+
+#
+spring:
+  application:
+    name: wait_for_keystore
+
+  #
+  output:
+    ansi:
+      enabled: always
+
+  #
+  threads:
+    virtual:
+      enabled: true
+
+# ====================== Graxon =======================
+
+#
+graxon:
+  core:
+    url: ${GRAXON_CORE_URL:http://localhost:8801}

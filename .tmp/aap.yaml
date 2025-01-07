@@ -1,0 +1,201 @@
+# Source: spring-cloud-dataflow/templates/server/deployment.yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: release-name-spring-cloud-dataflow-server
+  labels:
+    app.kubernetes.io/instance: release-name
+    app.kubernetes.io/managed-by: Helm
+    app.kubernetes.io/name: spring-cloud-dataflow
+    app.kubernetes.io/version: 2.11.5
+    helm.sh/chart: spring-cloud-dataflow-34.1.0
+    app.kubernetes.io/component: server
+  namespace: "default"
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/instance: release-name
+      app.kubernetes.io/name: spring-cloud-dataflow
+      app.kubernetes.io/component: server
+  strategy:
+    type: RollingUpdate
+  template:
+    metadata:
+      annotations:
+        checksum/configuration: 9146b60fb8c4f17f0d3c4b2ea5e91df3b3a13d716515a83bd78d1a80d774123a
+      labels:
+        app.kubernetes.io/instance: release-name
+        app.kubernetes.io/managed-by: Helm
+        app.kubernetes.io/name: spring-cloud-dataflow
+        app.kubernetes.io/version: 2.11.5
+        helm.sh/chart: spring-cloud-dataflow-34.1.0
+        app.kubernetes.io/component: server
+    spec:
+
+      serviceAccountName: release-name-spring-cloud-dataflow
+      automountServiceAccountToken: true
+      affinity:
+        podAffinity:
+
+        podAntiAffinity:
+          preferredDuringSchedulingIgnoredDuringExecution:
+            - podAffinityTerm:
+                labelSelector:
+                  matchLabels:
+                    app.kubernetes.io/instance: release-name
+                    app.kubernetes.io/name: spring-cloud-dataflow
+                    app.kubernetes.io/component: server
+                topologyKey: kubernetes.io/hostname
+              weight: 1
+        nodeAffinity:
+
+      securityContext:
+        fsGroup: 1001
+        fsGroupChangePolicy: Always
+        supplementalGroups: []
+        sysctls: []
+      initContainers:
+        - name: wait-for-backends
+          image: docker.io/bitnami/kubectl:1.31.3-debian-12-r1
+          imagePullPolicy: "IfNotPresent"
+          command:
+            - /scripts/wait-for-backends.sh
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+                - ALL
+            privileged: false
+            readOnlyRootFilesystem: true
+            runAsGroup: 1001
+            runAsNonRoot: true
+            runAsUser: 1001
+            seLinuxOptions: {}
+            seccompProfile:
+              type: RuntimeDefault
+          resources:
+            limits:
+              cpu: 150m
+              ephemeral-storage: 2Gi
+              memory: 192Mi
+            requests:
+              cpu: 100m
+              ephemeral-storage: 50Mi
+              memory: 128Mi
+          volumeMounts:
+            - name: empty-dir
+              mountPath: /tmp
+              subPath: tmp-dir
+            - name: scripts
+              mountPath: /scripts/wait-for-backends.sh
+              subPath: wait-for-backends.sh
+      containers:
+        - name: server
+          image: docker.io/bitnami/spring-cloud-dataflow:2.11.5-debian-12-r3
+          imagePullPolicy: "IfNotPresent"
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+                - ALL
+            privileged: false
+            readOnlyRootFilesystem: true
+            runAsGroup: 1001
+            runAsNonRoot: true
+            runAsUser: 1001
+            seLinuxOptions: {}
+            seccompProfile:
+              type: RuntimeDefault
+          env:
+            - name: BITNAMI_DEBUG
+              value: "false"
+            - name: SERVER_PORT
+              value: "8080"
+            - name: SPRING_CLOUD_CONFIG_ENABLED
+              value: "false"
+            - name: SPRING_CLOUD_KUBERNETES_CONFIG_ENABLE_API
+              value: "false"
+            - name: SPRING_CLOUD_KUBERNETES_SECRETS_ENABLE_API
+              value: "false"
+            - name: SPRING_CLOUD_KUBERNETES_SECRETS_PATHS
+              value: "/etc/secrets"
+            - name: SPRING_CLOUD_DATAFLOW_SERVER_URI
+              value: "http://release-name-spring-cloud-dataflow-server.default.svc.cluster.local:8080"
+            - name: SPRING_CLOUD_DATAFLOW_FEATURES_STREAMS_ENABLED
+              value: "true"
+            - name: SPRING_CLOUD_DATAFLOW_FEATURES_TASKS_ENABLED
+              value: "true"
+            - name: SPRING_CLOUD_DATAFLOW_FEATURES_SCHEDULES_ENABLED
+              value: "true"
+            - name: SPRING_CLOUD_SKIPPER_CLIENT_SERVER_URI
+              value: "http://release-name-spring-cloud-dataflow-skipper.default.svc.cluster.local/api"
+            - name: SPRING_APPLICATION_JSON
+              value: "{ \"maven\": { \"local-repository\": null, \"remote-repositories\": { \"repo1\": { \"url\": \"https://repo.spring.io/libs-snapshot\"} } } }"
+            - name: KUBERNETES_NAMESPACE
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.namespace
+            - name: KUBERNETES_TRUST_CERTIFICATES
+              value: "false"
+            - name: SPRING_CLOUD_DATAFLOW_TASK_COMPOSEDTASKRUNNER_URI
+              value: 'docker://docker.io/bitnami/spring-cloud-dataflow-composed-task-runner:2.11.5-debian-12-r3'
+          ports:
+            - name: http
+              containerPort: 8080
+              protocol: TCP
+          livenessProbe:
+            tcpSocket:
+              port: http
+            initialDelaySeconds: 120
+            periodSeconds: 20
+            timeoutSeconds: 1
+            successThreshold: 1
+            failureThreshold: 6
+          readinessProbe:
+            httpGet:
+              path: /management/health
+              port: http
+            initialDelaySeconds: 120
+            periodSeconds: 20
+            timeoutSeconds: 1
+            successThreshold: 1
+            failureThreshold: 6
+          resources:
+            limits:
+              cpu: 750m
+              ephemeral-storage: 2Gi
+              memory: 768Mi
+            requests:
+              cpu: 500m
+              ephemeral-storage: 50Mi
+              memory: 512Mi
+          volumeMounts:
+            - name: empty-dir
+              mountPath: /tmp
+              subPath: tmp-dir
+            - name: empty-dir
+              mountPath: /.m2
+              subPath: app-m2-dir
+            - name: database
+              mountPath: /etc/secrets/database
+              readOnly: true
+            - name: config
+              mountPath: /opt/bitnami/spring-cloud-dataflow/conf
+              readOnly: true
+      volumes:
+        - name: empty-dir
+          emptyDir: {}
+        - name: database
+          secret:
+            secretName: release-name-mariadb
+        - name: config
+          configMap:
+            name: release-name-spring-cloud-dataflow-server
+            items:
+              - key: application.yaml
+                path: application.yml
+        - name: scripts
+          configMap:
+            name: release-name-spring-cloud-dataflow-scripts
+            defaultMode: 0755

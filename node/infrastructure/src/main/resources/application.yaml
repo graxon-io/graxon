@@ -1,0 +1,119 @@
+# =================== Server Config ===================
+
+#
+server:
+  # port to listen on
+  port: 8802
+  # forward headers to the downstream services
+  forward-headers-strategy: framework
+  #
+  ssl:
+    # Accepting HTTPS connections only
+    enabled: true
+    # The path to the keystore containing the certificate
+    key-store: classpath:keystore.p12
+    # The password used to generate the certificate
+    key-store-password: changeit
+    # The format used for the keystore
+    key-store-type: PKCS12
+    # The alias mapped to the certificate
+    key-alias: node
+    # The path to the truststore containing the client certificate
+    trust-store: classpath:truststore.jks
+    # The password used to generate the truststore
+    trust-store-password: changeit
+    # Client authentication is must
+    client-auth: need
+
+# ======================== Cors =======================
+
+#
+web:
+  cors:
+    allowed-origins: "*"
+    allowed-methods: GET, POST, PATCH, PUT, DELETE, OPTIONS, HEAD
+    max-age: 3600
+    allowed-headers: "*"
+    exposed-headers: "*"
+
+# =================== Logging Config ===================
+
+#
+logging:
+  level:
+    io.graxon: TRACE
+
+# =================== Spring Config ===================
+
+#
+spring:
+  application:
+    name: graxon-node-${random.int[1,50]}
+
+  #
+  output:
+    ansi:
+      enabled: always
+
+  #
+  threads:
+    virtual:
+      enabled: true
+
+  #
+  boot:
+    admin:
+      client:
+        instance:
+          name: graxon-node
+          service-base-url: https://graxon.home.local/
+
+# ================== SpringDoc Config ==================
+
+#
+springdoc:
+  api-docs:
+    path: /node-service/v3/api-docs
+  swagger-ui:
+    enabled: true
+    use-root-path: true
+  show-actuator: false
+
+# ====================== Actuator ======================
+
+#
+management:
+  server:
+    port: 8800
+    ssl:
+      enabled: false
+  info:
+    env:
+      enabled: true
+  endpoints:
+    web:
+      exposure:
+        include: "*"
+  endpoint:
+    health:
+      show-details: always
+      group:
+        custom:
+          show-details: always
+          show-components: always
+      probes:
+        enabled: true
+
+  # ---------------- OpenTelemetry ---------------- #
+
+  #
+  otlp:
+    metrics:
+      export:
+        enabled: false
+    tracing:
+      export:
+        enabled: false
+    logging:
+      export:
+        enabled: false

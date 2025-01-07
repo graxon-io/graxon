@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <!-- -->
+    <parent>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-parent</artifactId>
+        <version>3.4.1</version>
+        <relativePath/> <!-- lookup parent from repository -->
+    </parent>
+
+    <!-- -->
+    <groupId>io.graxon</groupId>
+    <artifactId>boot</artifactId>
+    <version>0.0.1-SNAPSHOT</version>
+    <packaging>pom</packaging>
+
+    <!-- -->
+    <name>graxon</name>
+    <url>https://github.com/graxon-io/graxon</url>
+
+    <!-- -->
+    <properties>
+        <graxon-library.version>0.0.1-SNAPSHOT</graxon-library.version>
+        <spring-cloud.version>2024.0.0</spring-cloud.version>
+        <springdoc.version>2.7.0</springdoc.version>
+        <spring-boot-admin.version>3.4.1</spring-boot-admin.version>
+        <fabric8.version>7.0.1</fabric8.version>
+        <opentelemetry.logback.version>2.7.0-alpha</opentelemetry.logback.version>
+    </properties>
+
+    <!-- -->
+    <dependencyManagement>
+        <dependencies>
+
+            <!-- -->
+            <dependency>
+                <groupId>io.graxon</groupId>
+                <artifactId>library</artifactId>
+                <version>${graxon-library.version}</version>
+            </dependency>
+
+            <!-- enables openapi and swagger -->
+            <dependency>
+                <groupId>org.springdoc</groupId>
+                <artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
+                <version>${springdoc.version}</version>
+            </dependency>
+
+            <!-- observability - logback appender -->
+            <dependency>
+                <groupId>io.opentelemetry.instrumentation</groupId>
+                <artifactId>opentelemetry-logback-appender-1.0</artifactId>
+                <version>${opentelemetry.logback.version}</version>
+            </dependency>
+
+            <!-- -->
+            <dependency>
+                <groupId>io.fabric8</groupId>
+                <artifactId>kubernetes-client</artifactId>
+                <version>${fabric8.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>io.fabric8</groupId>
+                <artifactId>crd-generator-maven-plugin</artifactId>
+                <version>${fabric8.version}</version>
+            </dependency>
+
+            <!-- spring cloud -->
+            <dependency>
+                <groupId>org.springframework.cloud</groupId>
+                <artifactId>spring-cloud-dependencies</artifactId>
+                <version>${spring-cloud.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+
+            <!-- -->
+            <dependency>
+                <groupId>de.codecentric</groupId>
+                <artifactId>spring-boot-admin-dependencies</artifactId>
+                <version>${spring-boot-admin.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+
+        </dependencies>
+    </dependencyManagement>
+
+    <!-- -->
+    <modules>
+        <module>admin</module>
+        <module>gateway</module>
+        <module>library</module>
+        <module>wait-for-keystore</module>
+        <module>core</module>
+        <module>node</module>
+        <module>notifier</module>
+    </modules>
+
+</project>

@@ -1,0 +1,7 @@
+
+#
+profile: kubernetes,opentelemetry
+
+#
+otel:
+  host: graxon-graxon-otel

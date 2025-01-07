@@ -1,0 +1,89 @@
+# =================== Server Config ===================
+
+#
+server:
+  # port to listen on
+  port: 8810
+  # forward headers to the downstream services
+  forward-headers-strategy: framework
+
+# ======================== Cors =======================
+
+#
+web:
+  cors:
+    allowed-origins: "*"
+    allowed-methods: GET, POST, PATCH, PUT, DELETE, OPTIONS, HEAD
+    max-age: 3600
+    allowed-headers: "*"
+    exposed-headers: "*"
+
+# =================== Logging Config ===================
+
+#
+logging:
+  level:
+    io.graxon: TRACE
+
+# =================== Spring Config ===================
+
+#
+spring:
+  application:
+    name: graxon-notifier-${random.int[1,50]}
+
+  #
+  output:
+    ansi:
+      enabled: always
+
+  #
+  threads:
+    virtual:
+      enabled: true
+
+# ================== SpringDoc Config ==================
+
+#
+springdoc:
+  api-docs:
+    path: /notifier-service/v3/api-docs
+  swagger-ui:
+    enabled: true
+    use-root-path: true
+  show-actuator: false
+
+# ====================== Actuator ======================
+
+#
+management:
+  info:
+    env:
+      enabled: true
+  endpoints:
+    web:
+      exposure:
+        include: "*"
+  endpoint:
+    health:
+      show-details: always
+      group:
+        custom:
+          show-details: always
+          show-components: always
+      probes:
+        enabled: true
+
+  # ---------------- OpenTelemetry ---------------- #
+
+  #
+  otlp:
+    metrics:
+      export:
+        enabled: false
+    tracing:
+      export:
+        enabled: false
+    logging:
+      export:
+        enabled: false

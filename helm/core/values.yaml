@@ -1,0 +1,45 @@
+
+#
+profile: kubernetes,opentelemetry,events
+
+#
+ingress:
+  ## Enable ingress resource for Management console
+  ##
+  enabled: true
+  ## Default host for the ingress resource
+  ##
+  hostname: graxon.home.local
+  ## Additional annotations for the Ingress resource.
+  ##
+  annotations:
+    cert-manager.io/cluster-issuer: selfsigned-issuer
+
+#
+rabbitmq:
+  ## RabbitMQ Authentication parameters
+  ##
+  auth:
+    ## @param auth.username Username for RabbitMQ
+    ##
+    username: user
+    ## @param auth.password Password for RabbitMQ
+    ##
+    password: password
+    ## Enable encryption to rabbitmq
+    ##
+    tls:
+      enabled: false
+  ## Configure the ingress resource that allows you to access the
+  ##
+  ingress:
+    ## @param ingress.enabled Enable ingress resource for Management console
+    ##
+    enabled: true
+    ## @param ingress.hostname Default host for the ingress resource
+    ##
+    hostname: rabbitmq.home.local
+    ## @param ingress.annotations Additional annotations for the Ingress resource.
+    ##
+    annotations:
+      cert-manager.io/cluster-issuer: selfsigned-issuer
