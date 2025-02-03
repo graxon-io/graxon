@@ -1,0 +1,52 @@
+# =================== Server Config ===================
+
+#
+server:
+  # port to listen on
+  port: 8820
+  # forward headers to the downstream services
+  forward-headers-strategy: framework
+
+# =================== Spring Config ===================
+
+#
+spring:
+  application:
+    name: graxon-admin
+
+  #
+  output:
+    ansi:
+      enabled: always
+
+  #
+  threads:
+    virtual:
+      enabled: true
+
+  #
+  thymeleaf:
+    check-template-location: false
+
+  #
+  boot:
+    admin:
+      ui:
+        brand: "Graxon"
+        title: "Graxon Admin"
+
+  #
+  cloud:
+    kubernetes:
+      discovery:
+        primary-port-name: management
+        service-labels:
+          spring-admin: "true"
+
+  #
+  security:
+    user:
+      name: "admin"
+      password: "password"
+
+

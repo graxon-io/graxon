@@ -1,0 +1,31 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: oidc-ingress
+  namespace: default
+  annotations:
+    cert-manager.io/cluster-issuer: selfsigned-issuer
+    nginx.ingress.kubernetes.io/backend-protocol: "HTTPS"
+spec:
+  rules:
+    - host: jwks.home.local
+      http:
+        paths:
+          - path: /.well-known/openid-configuration
+            pathType: Exact
+            backend:
+              service:
+                name: kubernetes
+                port:
+                  number: 443
+          - path: /openid/v1/jwks
+            pathType: Exact
+            backend:
+              service:
+                name: kubernetes
+                port:
+                  number: 443
+  tls:
+    - hosts:
+        - jwks.home.local
+      secretName: jwks.home.local

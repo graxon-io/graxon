@@ -1,0 +1,16 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ .Release.Name }}-core
+  labels: {{- include "common.labels.core" . | nindent 4 }}
+    spring-admin: "true"
+spec:
+  type: ClusterIP
+  ports:
+    - name: management
+      port: 8800
+      targetPort: management
+    - name: https
+      port: 8801
+      targetPort: https
+  selector: {{- include "common.labels.core" . | nindent 4 }}

@@ -1,12 +1,3 @@
-
-# NGiNX 
-
-https://arunsworld.medium.com/ssl-passthrough-via-kubernetes-ingress-b3eaf3c7c9da
-
-
-
-
-
 ## Understanding Certificates and Keys
 Before we dive into generating certificates, let’s clarify some terminology:
 

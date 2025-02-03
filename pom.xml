@@ -92,13 +92,12 @@
 
     <!-- -->
     <modules>
-        <module>admin</module>
-        <module>gateway</module>
-        <module>library</module>
-        <module>wait-for-keystore</module>
-        <module>core</module>
-        <module>node</module>
-        <module>notifier</module>
+        <module>packages/library</module>
+        <module>support/admin</module>
+        <module>support/gateway</module>
+        <module>services/core</module>
+        <module>services/notifier</module>
+        <module>support/wait-for-keystore</module>
     </modules>
 
 </project>

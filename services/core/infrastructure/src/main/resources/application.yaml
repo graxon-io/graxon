@@ -1,0 +1,112 @@
+# =================== Server Config ===================
+
+#
+server:
+  # port to listen on
+  port: 8801
+  # forward headers to the downstream services
+  forward-headers-strategy: framework
+  # ssl configuration
+  ssl:
+    # accepting HTTPS connections only
+    enabled: true
+    # server certificate settings
+    key-store: classpath:keystore.p12
+    key-store-password: changeit
+    key-store-type: PKCS12
+    key-alias: core
+    # trust store settings
+    trust-store: classpath:truststore.jks
+    trust-store-password: changeit
+    trust-store-type: JKS
+    # client authentication
+    client-auth: need
+
+# ======================== Cors =======================
+
+#
+web:
+  cors:
+    allowed-origins: "*"
+    allowed-methods: GET, POST, PATCH, PUT, DELETE, OPTIONS, HEAD
+    max-age: 3600
+    allowed-headers: "*"
+    exposed-headers: "*"
+
+# =================== Logging Config ===================
+
+#
+logging:
+  level:
+    io.graxon: TRACE
+    org:
+      springframework:
+        security: TRACE
+
+# =================== Spring Config ===================
+
+#
+spring:
+  application:
+    name: graxon-core-${random.int[1,50]}
+
+  #
+  output:
+    ansi:
+      enabled: always
+
+  #
+  threads:
+    virtual:
+      enabled: true
+
+# ================== SpringDoc Config ==================
+
+#
+springdoc:
+  api-docs:
+    path: /core-service/v3/api-docs
+  swagger-ui:
+    enabled: true
+    use-root-path: true
+  show-actuator: false
+  writer-with-order-by-keys: true
+
+# ====================== Actuator ======================
+
+#
+management:
+  server:
+    port: 8800
+    ssl:
+      enabled: false
+  info:
+    env:
+      enabled: true
+  endpoints:
+    web:
+      exposure:
+        include: "*"
+  endpoint:
+    health:
+      show-details: always
+      group:
+        custom:
+          show-details: always
+          show-components: always
+      probes:
+        enabled: true
+
+  # ---------------- OpenTelemetry ---------------- #
+
+  #
+  otlp:
+    metrics:
+      export:
+        enabled: false
+    tracing:
+      export:
+        enabled: false
+    logging:
+      export:
+        enabled: false
