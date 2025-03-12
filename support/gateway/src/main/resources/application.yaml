@@ -38,7 +38,10 @@ spring:
     oauth2:
       resourceserver:
         jwt:
-          issuer-uri: http://keycloak.keycloak.svc.cluster.local/realms/Graxon
+          issuer-uri: ${OAUTH_ISSUER_URI:http://localhost:8080/auth/realms/graxon}
+    user:
+      name: ${ACTUATOR_USERNAME:actuator}
+      password: ${ACTUATOR_PASSWORD:password}
 
   # propagate context information (such as tracing or logging context) across reactive operations
   reactor:
@@ -57,36 +60,51 @@ spring:
           key-store-type: PKCS12
           # truststore configuration (trust all certificates on routes)
           use-insecure-trust-manager: true
+      default-filters:
+        - TokenRelayFilter
       routes:
         # ----------------- Gateway ----------------- #
+
+        #
+        - id: projects
+          uri: https://${GRAXON_PROJECTS_HOST:localhost}:8801
+          predicates:
+            - Path=/api/v1/projects/**
 
         #
         - id: core
           filters:
             - BeforeRedirectionFilter
-          uri: https://${GRAXON_CORE_HOST:localhost}:8801
+          uri: https://${GRAXON_CORE_HOST:localhost}:8802
           predicates:
-            - Path=/api/v1/core/**,/api/v1/projects/**
+            - Path=/api/v1/core/**
 
         #
         - id: notifier
-          uri: http://${GRAXON_NOTIFIER_HOST:localhost}:8810
+          uri: https://${GRAXON_NOTIFIER_HOST:localhost}:8810
           predicates:
             - Path=/api/v1/notifier/**
 
         # ----------------- Swagger ----------------- #
 
         #
+        - id: projects-service
+          uri: https://${GRAXON_PROJECTS_HOST:localhost}:8801
+          predicates:
+            - Path=/projects-service/v3/api-docs
+
+        #
         - id: core-service
-          uri: https://${GRAXON_CORE_HOST:localhost}:8801
+          uri: https://${GRAXON_CORE_HOST:localhost}:8802
           predicates:
             - Path=/core-service/v3/api-docs
 
         #
         - id: notifier-service
-          uri: http://${GRAXON_NOTIFIER_HOST:localhost}:8810
+          uri: https://${GRAXON_NOTIFIER_HOST:localhost}:8810
           predicates:
             - Path=/notifier-service/v3/api-docs
+
 
 # ================== SpringDoc Config ==================
 
@@ -97,6 +115,8 @@ springdoc:
     urls:
       - name: gateway
         url: /v3/api-docs
+      - name: projects
+        url: /projects-service/v3/api-docs
       - name: core
         url: /core-service/v3/api-docs
       - name: notifier

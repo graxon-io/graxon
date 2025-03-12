@@ -2,40 +2,51 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: {{ .Release.Name }}-gateway
-  labels: {{- include "common.labels.gateway" . | nindent 4 }}
+  namespace: {{ .Release.Namespace }}
+  labels: {{- include "gateway.labels.default" . | nindent 4 }}
 spec:
   replicas: 1
   selector:
-    matchLabels: {{- include "common.labels.gateway" . | nindent 6 }}
+    matchLabels: {{- include "gateway.labels.selector" . | nindent 6 }}
   template:
     metadata:
-      labels: {{- include "common.labels.gateway" . | nindent 8 }}
+      labels: {{- include "gateway.labels.selector" . | nindent 8 }}
     spec:
       containers:
-      - name: graxon-gateway
-        image: localhost:5001/gateway:latest
-        imagePullPolicy: Always        
-        ports:
-        - name: http
-          containerPort: 8800
-        env:
-        - name: SPRING_PROFILES_ACTIVE
-          value: {{ .Values.profile }}
-        - name: GRAXON_OTEL_HOST
-          value: {{ .Release.Name }}-otel
-        - name: GRAXON_CORE_HOST
-          value: {{ .Release.Name }}-core
-        - name: GRAXON_NOTIFIER_HOST
-          value: {{ .Release.Name }}-notifier
-        livenessProbe:
-          httpGet:
-            path: /actuator/health/liveness
-            port: http
-          initialDelaySeconds: 10
-          periodSeconds: 10
-        readinessProbe:
-          httpGet:
-            path: /actuator/health/readiness
-            port: http
-          initialDelaySeconds: 10
-          periodSeconds: 10
+        - name: graxon-gateway
+          image: localhost:5001/gateway:latest
+          imagePullPolicy: Always
+          ports:
+            - name: http
+              containerPort: 8800
+          env:
+            {{ include "env.profiles" . | nindent 12 }}
+            {{ include "env.actuator" . | nindent 12 }}
+            - name: OAUTH_ISSUER_URI
+              value: {{ .Values.oauth.issuer_uri }}
+            - name: GRAXON_OTEL_HOST
+              value: {{ .Release.Name }}-otel
+            - name: GRAXON_PROJECTS_HOST
+              value: {{ .Release.Name }}-projects
+            - name: GRAXON_CORE_HOST
+              value: {{ .Release.Name }}-core
+            - name: GRAXON_NOTIFIER_HOST
+              value: {{ .Release.Name }}-notifier
+          livenessProbe:
+            httpGet:
+              path: /actuator/health/liveness
+              port: http
+              httpHeaders:
+                - name: Authorization
+                  value: Basic {{ printf "%s:%s" .Values.actuator.username .Values.actuator.password | b64enc }}
+            initialDelaySeconds: 10
+            periodSeconds: 10
+          readinessProbe:
+            httpGet:
+              path: /actuator/health/readiness
+              port: http
+              httpHeaders:
+                - name: Authorization
+                  value: Basic {{ printf "%s:%s" .Values.actuator.username .Values.actuator.password | b64enc }}
+            initialDelaySeconds: 10
+            periodSeconds: 10

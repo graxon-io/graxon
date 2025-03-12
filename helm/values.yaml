@@ -16,6 +16,19 @@ ingress:
     cert-manager.io/cluster-issuer: selfsigned-issuer
 
 #
+actuator:
+  ## Authentication parameters
+  ##
+  username: actuator
+  password: password
+
+#
+oauth:
+  ## OAuth2 Resource Server parameters
+  ##
+  issuer_uri: https://keycloak.home.local/realms/graxon
+
+#
 rabbitmq:
   ## RabbitMQ Authentication parameters
   ##
@@ -43,3 +56,4 @@ rabbitmq:
     ##
     annotations:
       cert-manager.io/cluster-issuer: selfsigned-issuer
+

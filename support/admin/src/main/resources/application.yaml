@@ -49,4 +49,12 @@ spring:
       name: "admin"
       password: "password"
 
+# =================== Custom Config ===================
+
+#
+actuator:
+  user:
+    name: ${ACTUATOR_USERNAME:actuator}
+    password: ${ACTUATOR_PASSWORD:password}
+
 

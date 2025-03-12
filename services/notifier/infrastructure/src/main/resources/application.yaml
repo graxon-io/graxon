@@ -6,6 +6,21 @@ server:
   port: 8810
   # forward headers to the downstream services
   forward-headers-strategy: framework
+  # ssl configuration
+  ssl:
+    # accepting HTTPS connections only
+    enabled: true
+    # server certificate settings
+    key-store: classpath:keystore.p12
+    key-store-password: changeit
+    key-store-type: PKCS12
+    key-alias: notifier
+    # trust store settings
+    trust-store: classpath:truststore.jks
+    trust-store-password: changeit
+    trust-store-type: JKS
+    # client authentication
+    client-auth: need
 
 # ======================== Cors =======================
 
@@ -42,6 +57,12 @@ spring:
     virtual:
       enabled: true
 
+  #
+  security:
+    user:
+      name: ${ACTUATOR_USERNAME:actuator}
+      password: ${ACTUATOR_PASSWORD:password}
+
 # ================== SpringDoc Config ==================
 
 #
@@ -52,11 +73,16 @@ springdoc:
     enabled: true
     use-root-path: true
   show-actuator: false
+  writer-with-order-by-keys: true
 
 # ====================== Actuator ======================
 
 #
 management:
+  server:
+    port: 8800
+    ssl:
+      enabled: false
   info:
     env:
       enabled: true

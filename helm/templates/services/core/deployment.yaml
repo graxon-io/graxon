@@ -2,37 +2,16 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: {{ .Release.Name }}-core
-  labels: {{- include "common.labels.core" . | nindent 4 }}
+  namespace: {{ .Release.Namespace }}
+  labels: {{- include "core.labels.default" . | nindent 4 }}
 spec:
   replicas: 1
   selector:
-    matchLabels: {{- include "common.labels.core" . | nindent 6 }}
+    matchLabels: {{- include "core.labels.selector" . | nindent 6 }}
   template:
     metadata:
-      labels: {{- include "common.labels.core" . | nindent 8 }}
+      labels: {{- include "core.labels.selector" . | nindent 8 }}
     spec:
-      initContainers:
-        - name: wait-for-backends
-          image: bitnami/kubectl:1.32.0
-          command:
-            - /scripts/wait-for-backends.sh
-          volumeMounts:
-            - name: scripts
-              mountPath: /scripts/wait-for-backends.sh
-              subPath: wait-for-backends.sh
-          securityContext:
-            allowPrivilegeEscalation: false
-            capabilities:
-              drop:
-                - ALL
-            privileged: false
-            readOnlyRootFilesystem: true
-            runAsGroup: 1001
-            runAsNonRoot: true
-            runAsUser: 1001
-            seLinuxOptions: { }
-            seccompProfile:
-              type: RuntimeDefault
       containers:
         - name: graxon-core
           image: localhost:5001/core:latest
@@ -41,31 +20,27 @@ spec:
             - name: management
               containerPort: 8800
             - name: https
-              containerPort: 8801
+              containerPort: 8802
           env:
-            - name: SPRING_PROFILES_ACTIVE
-              value: {{ .Values.profile }}
-            - name: GRAXON_RABBITMQ_HOST
-              value: {{ .Release.Name }}-rabbitmq-headless
-            - name: GRAXON_OTEL_HOST
-              value: {{ .Release.Name }}-otel
+            {{ include "env.profiles" . | nindent 12 }}
+            {{ include "env.default" . | nindent 12 }}
+            {{ include "env.actuator" . | nindent 12 }}
           livenessProbe:
             httpGet:
               path: /actuator/health/liveness
-              port: 8801
-              scheme: HTTPS
+              port: 8800
+              httpHeaders:
+                - name: Authorization
+                  value: Basic {{ printf "%s:%s" .Values.actuator.username .Values.actuator.password | b64enc }}
             initialDelaySeconds: 10
             periodSeconds: 10
           readinessProbe:
             httpGet:
               path: /actuator/health/readiness
-              port: 8801
-              scheme: HTTPS
+              port: 8800
+              httpHeaders:
+                - name: Authorization
+                  value: Basic {{ printf "%s:%s" .Values.actuator.username .Values.actuator.password | b64enc }}
             initialDelaySeconds: 10
             periodSeconds: 10
       serviceAccountName: {{ .Release.Name }}-core
-      volumes:
-        - name: scripts
-          configMap:
-            name: {{ .Release.Name }}-scripts
-            defaultMode: 0755

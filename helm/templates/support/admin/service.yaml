@@ -2,11 +2,12 @@ apiVersion: v1
 kind: Service
 metadata:
   name: {{ .Release.Name }}-admin
-  labels: {{- include "common.labels.admin" . | nindent 4 }}
+  namespace: {{ .Release.Namespace }}
+  labels: {{- include "admin.labels.default" . | nindent 4 }}
 spec:
   type: ClusterIP
   ports:
     - name: http
       port: 8820
       targetPort: http
-  selector: {{- include "common.labels.admin" . | nindent 4 }}
+  selector: {{- include "admin.labels.selector" . | nindent 4 }}

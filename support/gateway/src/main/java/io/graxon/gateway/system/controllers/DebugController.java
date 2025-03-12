@@ -1,5 +1,7 @@
 package io.graxon.gateway.system.controllers;
 
+import io.graxon.gateway.system.exceptions.CustomRequestAuthException;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -12,6 +14,7 @@ import java.util.UUID;
  *
  */
 @RestController
+@SecurityRequirement(name = "Bearer Authentication")
 @RequestMapping("/api/v1/gateway")
 public class DebugController {
 
@@ -25,5 +28,13 @@ public class DebugController {
     public String debug() {
         log.info("debugging...");
         return "gateway-" + UUID.randomUUID().toString();
+    }
+
+    /**
+     *
+     */
+    @GetMapping("/error")
+    public String error() {
+        throw new CustomRequestAuthException("error message...");
     }
 }

@@ -2,7 +2,8 @@ apiVersion: v1
 kind: Service
 metadata:
   name: {{ .Release.Name }}-gateway
-  labels: {{- include "common.labels.gateway" . | nindent 4 }}
+  namespace: {{ .Release.Namespace }}
+  labels: {{- include "gateway.labels.default" . | nindent 4 }}
     spring-admin: "true"
 spec:
   type: ClusterIP
@@ -11,4 +12,4 @@ spec:
     - name: http
       port: 8800
       targetPort: http
-  selector: {{- include "common.labels.gateway" . | nindent 4 }}
+  selector: {{- include "gateway.labels.selector" . | nindent 4 }}

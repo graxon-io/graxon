@@ -3,7 +3,7 @@
 #
 server:
   # port to listen on
-  port: 8801
+  port: 8802
   # forward headers to the downstream services
   forward-headers-strategy: framework
   # ssl configuration
@@ -39,9 +39,6 @@ web:
 logging:
   level:
     io.graxon: TRACE
-    org:
-      springframework:
-        security: TRACE
 
 # =================== Spring Config ===================
 
@@ -59,6 +56,12 @@ spring:
   threads:
     virtual:
       enabled: true
+
+  #
+  security:
+    user:
+      name: ${ACTUATOR_USERNAME:actuator}
+      password: ${ACTUATOR_PASSWORD:password}
 
 # ================== SpringDoc Config ==================
 

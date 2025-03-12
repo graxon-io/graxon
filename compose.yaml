@@ -1,0 +1,31 @@
+version: '3.4'
+
+#
+services:
+
+  #
+  postgres:
+    image: bitnami/postgresql:17.4.0
+    restart: always
+    environment:
+      POSTGRESQL_USERNAME: keycloak
+      POSTGRESQL_PASSWORD: keycloak
+      POSTGRESQL_DATABASE: keycloak
+      POSTGRESQL_PORT_NUMBER: 5432
+  
+  #
+  keycloak:
+    image: bitnami/keycloak:26.1.2
+    restart: always
+    ports:
+      - 8080:8080
+    depends_on:
+      - postgres
+    environment:
+      KEYCLOAK_ADMIN_USER: admin
+      KEYCLOAK_ADMIN_PASSWORD: my_password
+      KEYCLOAK_DATABASE_HOST: postgres
+      KEYCLOAK_DATABASE_PORT: 5432
+      KEYCLOAK_DATABASE_NAME: keycloak
+      KEYCLOAK_DATABASE_USER: keycloak
+      KEYCLOAK_DATABASE_PASSWORD: keycloak

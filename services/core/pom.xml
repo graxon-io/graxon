@@ -17,7 +17,7 @@
 	<packaging>pom</packaging>
 
 	<!-- -->
-	<name>graxon-core</name>
+	<name>core</name>
 	<description>Demo project for Spring Boot</description>
 
 	<!-- -->

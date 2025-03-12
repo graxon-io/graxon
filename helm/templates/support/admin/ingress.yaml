@@ -2,7 +2,8 @@ apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   name: {{ .Release.Name }}-admin
-  labels: {{- include "common.labels.admin" . | nindent 4 }}
+  namespace: {{ .Release.Namespace }}
+  labels: {{- include "admin.labels.default" . | nindent 4 }}
   annotations:
     cert-manager.io/cluster-issuer: selfsigned-issuer
 spec:

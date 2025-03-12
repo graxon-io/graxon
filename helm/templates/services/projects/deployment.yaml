@@ -1,0 +1,45 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Release.Name }}-projects
+  namespace: {{ .Release.Namespace }}
+  labels: {{- include "projects.labels.default" . | nindent 4 }}
+spec:
+  replicas: 1
+  selector:
+    matchLabels: {{- include "projects.labels.selector" . | nindent 6 }}
+  template:
+    metadata:
+      labels: {{- include "projects.labels.selector" . | nindent 8 }}
+    spec:
+      containers:
+        - name: graxon-projects
+          image: localhost:5001/projects:latest
+          imagePullPolicy: Always
+          ports:
+            - name: management
+              containerPort: 8800
+            - name: https
+              containerPort: 8801
+          env:
+            {{ include "env.profiles" . | nindent 12 }}
+            {{ include "env.default" . | nindent 12 }}
+            {{ include "env.actuator" . | nindent 12 }}
+          livenessProbe:
+            httpGet:
+              path: /actuator/health/liveness
+              port: 8800
+              httpHeaders:
+                - name: Authorization
+                  value: Basic {{ printf "%s:%s" .Values.actuator.username .Values.actuator.password | b64enc }}
+            initialDelaySeconds: 10
+            periodSeconds: 10
+          readinessProbe:
+            httpGet:
+              path: /actuator/health/readiness
+              port: 8800
+              httpHeaders:
+                - name: Authorization
+                  value: Basic {{ printf "%s:%s" .Values.actuator.username .Values.actuator.password | b64enc }}
+            initialDelaySeconds: 10
+            periodSeconds: 10
